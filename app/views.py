@@ -4,10 +4,13 @@ Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
+from fileinput import filename
 import os
 from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
+from app.forms import UploadForm
+# from app import images
 
 
 ###
@@ -28,19 +31,31 @@ def about():
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
+
     if not session.get('logged_in'):
         abort(401)
 
     # Instantiate your form class
+    uploadform = UploadForm()
 
     # Validate file upload on submit
-    if request.method == 'POST':
+    if request.method == 'POST' and uploadform.validate():
         # Get file data and save to your uploads folder
+        file = uploadform.photo.data
+
+        # check if filename is blank
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+
+        filename = secure_filename(file.filename)
+        # print(filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))      
 
         flash('File Saved', 'success')
         return redirect(url_for('home'))
-
-    return render_template('upload.html')
+    flash_errors(uploadform)
+    return render_template('upload.html',form=uploadform)
 
 
 @app.route('/login', methods=['POST', 'GET'])
