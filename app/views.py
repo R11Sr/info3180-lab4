@@ -6,6 +6,7 @@ This file creates your application.
 """
 from fileinput import filename
 import os
+import math
 from app import app
 from flask import render_template, request, redirect, send_from_directory, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
@@ -87,7 +88,7 @@ def get_uploaded_images():
     return uploadList
 
 @app.route('/files')
-@login_required
+# @login_required
 def files():
     return render_template('files.html',imageList =get_uploaded_images())
 

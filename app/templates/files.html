@@ -5,14 +5,24 @@
 {% include 'flash_messages.html' %}
 
 
-<p class="lead">
-    <ul>
-            {%for image in imageList%}
-            <li>
-                <img src="{{url_for('get_image',filename=image )}}" alt="" srcset="">
-                {{image}}
-            </li>
-            {%endfor%}
-        </ul>
-</p>
+<div class="container">
+    <div class="row">
+        {%for image in imageList%}            
+
+        {%if (loop.index -1) is not divisibleby 3 %}
+            <div class="col-4 pb-4">
+                <img src="{{url_for('get_image',filename=image )}}" alt="{{image}}" class="rounded " width="300" height="300">
+            </div>
+        {%else%}
+            <div class="w-100"></div>
+            <div class="col-4 pb-4">
+                <img src="{{url_for('get_image',filename=image )}}" alt="{{image}}" class="rounded " width="300" height="300">
+            </div>
+        {%endif%}
+      
+        
+        {%endfor%}
+    </div>
+
+</div>
 {% endblock %}
