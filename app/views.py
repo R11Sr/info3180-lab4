@@ -7,9 +7,10 @@ This file creates your application.
 from fileinput import filename
 import os
 from app import app
-from flask import render_template, request, redirect, url_for, flash, session, abort
+from flask import render_template, request, redirect, send_from_directory, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
 from app.forms import UploadForm
+from flask_login import login_required
 # from app import images
 
 
@@ -56,6 +57,39 @@ def upload():
         return redirect(url_for('home'))
     flash_errors(uploadform)
     return render_template('upload.html',form=uploadform)
+
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    try:
+        return send_from_directory(os.path.join(os.getcwd(),app.config['UPLOAD_FOLDER']),filename)
+    except FileNotFoundError:
+        abort(404)
+
+#Iterates over the contents of the uploads folder and stores the names in a 
+# list which the function returns
+def get_uploaded_images():
+    rootdir = os.getcwd()
+
+    rootlen = len(rootdir)
+    uploadList = []
+    for subdir, dirs, files in os.walk(rootdir + '/uploads'): 
+        for file in files:
+            uploadList.append(os.path.join(subdir, file))
+
+    for x in range(len(uploadList)):
+        # creates a list of file names minus the path dir
+        uploadList[x] = uploadList[x][rootlen +len("/uploads/"):]
+
+    #filers list 
+    uploadList = [ i for i in uploadList if (i.find('.jpg') >0) or (i.find('.png') > 0)]
+    # print(f"modified List: {uploadList}")
+    return uploadList
+
+@app.route('/files')
+@login_required
+def files():
+    return render_template('files.html',imageList =get_uploaded_images())
 
 
 @app.route('/login', methods=['POST', 'GET'])

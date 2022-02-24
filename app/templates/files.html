@@ -1,0 +1,18 @@
+{%extends "base.html"%}
+
+{% block main %}
+<h1 class="page-header">Images</h1>
+{% include 'flash_messages.html' %}
+
+
+<p class="lead">
+    <ul>
+            {%for image in imageList%}
+            <li>
+                <img src="{{url_for('get_image',filename=image )}}" alt="" srcset="">
+                {{image}}
+            </li>
+            {%endfor%}
+        </ul>
+</p>
+{% endblock %}
